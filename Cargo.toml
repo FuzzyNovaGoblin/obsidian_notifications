@@ -1,5 +1,5 @@
 [package]
-name = "obsidian_dis_notification"
+name = "obsidian_notifications"
 version = "0.1.0"
 edition = "2021"
 

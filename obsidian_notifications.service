@@ -1,0 +1,21 @@
+# actual file in /etc/systemd/system
+
+[Unit]
+Description=obsidian notification service through discord
+After=multi-user.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/home/fuzzy/.cargo/bin/obsidian_notifications
+User=fuzzy
+Group=fuzzy
+Type=idle
+Restart=on-abnormal
+RestartSec=15
+RestartForceExitStatus=1
+RestartForceExitStatus=26
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target
