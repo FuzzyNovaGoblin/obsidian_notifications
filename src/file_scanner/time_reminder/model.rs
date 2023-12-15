@@ -74,19 +74,19 @@ impl DateTimeParts {
 
 impl Display for DateTimeParts {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let get_str = |v: Option<u32>| match v {
+        let get_str = |v: Option<u32>, count: usize| match v {
             Some(v) => v.to_string(),
-            None => "~".to_owned(),
+            None => "~".repeat(count),
         };
 
         write!(
             f,
             "{}-{}-{} {:0>2}:{:0>2}",
-            get_str(self.year),
-            get_str(self.month),
-            get_str(self.day),
-            get_str(self.hour),
-            get_str(self.minute),
+            get_str(self.year, 4),
+            get_str(self.month, 2),
+            get_str(self.day, 2),
+            get_str(self.hour, 2),
+            get_str(self.minute, 2),
         )?;
 
         if let Some(s) = self.second {
