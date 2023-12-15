@@ -22,7 +22,7 @@ pub struct DateTimeParts {
 }
 
 impl DateTimeParts {
-    pub fn new<'a>(cap: &Captures<'a>) -> Result<DateTimeParts, String> {
+    pub fn new(cap: &Captures<'_>) -> Result<DateTimeParts, String> {
         Ok(DateTimeParts {
             year: Self::parse_u32(cap.name("year"))?,
             month: Self::parse_u32(cap.name("month"))?,
@@ -33,18 +33,18 @@ impl DateTimeParts {
         })
     }
 
-    fn parse_u32<'a>(mat: Option<Match<'a>>) -> Result<Option<u32>, String> {
+    fn parse_u32(mat: Option<Match<'_>>) -> Result<Option<u32>, String> {
         match mat {
             Some(v) => match v.as_str().parse::<u32>() {
                 Ok(v) => Ok(Some(v)),
                 Err(e) => {
-                    return Err(format!(
+                    Err(format!(
                             "Error parsing value ({value}) as u32\nError at {file}:{line}  with message:```{msg:?}```",
                             value=v.as_str(),
                             file = file!(),
                             line = line!(),
                             msg = e
-                        ));
+                        ))
                 }
             },
             None => Ok(None),

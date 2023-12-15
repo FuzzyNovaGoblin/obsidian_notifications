@@ -7,7 +7,7 @@ use crate::bot::{
 use chrono::prelude::*;
 use regex::Regex;
 use std::{
-    collections::{hash_map::Keys, HashMap, HashSet},
+    collections::{HashMap, HashSet},
     fs,
     path::PathBuf,
     time::Duration,
@@ -59,7 +59,7 @@ pub async fn look_for_time_reminders(ctx: DisCtx, config: FileSearchConfig) {
                     };
 
                     for line in file_data.lines() {
-                        for cap in date_time_regex.captures_iter(&line) {
+                        for cap in date_time_regex.captures_iter(line) {
                             let time_parts = match DateTimeParts::new(&cap) {
                                 Ok(v) => v,
                                 Err(e_msg) => {

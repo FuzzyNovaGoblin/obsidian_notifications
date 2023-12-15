@@ -37,9 +37,9 @@ pub async fn report_reminder_notification(
 ) {
     println!("report_reminder_notification {reminder_msg}  time: {time}");
 
-    let embed = CreateEmbed::new().title(reminder_msg).description(format!("time: {time}\nfile: {file}"));
+    let embed = CreateEmbed::new().title(reminder_msg.clone()).description(format!("time: {time}\nfile: {file}"));
 
-    send_msg(ctx, format!("reminder @ {time}"), None, Some(vec![embed]), dest)
+    send_msg(ctx, reminder_msg, None, Some(vec![embed]), dest)
         .await
         .unwrap();
 }
