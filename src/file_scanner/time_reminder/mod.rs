@@ -1,9 +1,9 @@
 use self::model::{DateTimeParts, ReminderKey};
 use super::file_search_config::FileSearchConfig;
-use crate::bot::{
+use crate::{bot::{
     context::DisCtx,
     send_msgs::{report_reminder_notification, report_rust_error},
-};
+}, file_scanner::path_str_no_root};
 use chrono::prelude::*;
 use regex::Regex;
 use std::{
@@ -27,6 +27,9 @@ pub async fn look_for_time_reminders(ctx: DisCtx, config: FileSearchConfig) {
     let ignore_files =
         Regex::new(r#"(\/\.DS_Store$)|(\.[jJ][pP][gG]$)|(\.[jJ][pP][eE][gG]$)|(\.[pP][nN][gG]$)"#)
             .expect("failed to compile RegEx ignore_files");
+    let ignore_paths =
+        Regex::new(r#"(^.trash)"#)
+            .expect("failed to compile RegEx ignore_paths");
 
     loop {
         let mut discovered_pass: HashSet<ReminderKey> = HashSet::new();
@@ -37,7 +40,10 @@ pub async fn look_for_time_reminders(ctx: DisCtx, config: FileSearchConfig) {
             let paths = std::fs::read_dir(path).unwrap();
             for item in paths.map(Result::unwrap) {
                 let path = item.path();
-                if path.is_dir() {
+                if path.is_dir(){
+                    if ignore_paths.is_match(&path_str_no_root(&path, config.root_dir)){
+                        continue;
+                    }
                     path_queue.push(path.clone());
                 } else if ignore_files.is_match(path.to_str().unwrap()) {
                     continue;
@@ -142,7 +148,7 @@ async fn countdown_reminder(ctx: DisCtx, config: FileSearchConfig, key: Reminder
     };
 
     let dif = target_time.signed_duration_since(Local::now());
-    
+
     if dif.abs() == dif {
         sleep(dif.to_std().unwrap()).await;
     } else if dif.abs().to_std().unwrap() >= Duration::from_secs(60) {
@@ -154,7 +160,7 @@ async fn countdown_reminder(ctx: DisCtx, config: FileSearchConfig, key: Reminder
         key.msg,
         config.notification_channel,
         format!("{}", key.time_parts),
-        key.file_path
+        path_str_no_root(&key.file_path, config.root_dir)
     ));
 
     sleep(Duration::from_secs(60)).await;
