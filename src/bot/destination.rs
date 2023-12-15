@@ -7,7 +7,9 @@ pub enum Destination {
     Fuzzy,
     Bean,
     MagicBeansObsidianCh,
-    DebugObsidianCh,
+    FuzzyObsidianCh,
+    DebugObsidianFuzzyCh,
+    DebugObsidianMagicBeansCh,
 }
 
 include!("secret_ids.rs");
@@ -30,7 +32,11 @@ impl Destination {
                     .id
             }
             Destination::MagicBeansObsidianCh => ChannelId::new(MAGIC_BEANS_OBSIDIAN_CH_ID),
-            Destination::DebugObsidianCh => ChannelId::new(DEBUG_OBSIDIAN_CH_ID),
+            Destination::FuzzyObsidianCh => ChannelId::new(FUZZY_OBSIDIAN_CH_ID),
+            Destination::DebugObsidianFuzzyCh => ChannelId::new(DEBUG_OBSIDIAN_FUZZY_CH_ID),
+            Destination::DebugObsidianMagicBeansCh => {
+                ChannelId::new(DEBUG_OBSIDIAN_MAGIC_BEANS_CH_ID)
+            }
         }
     }
 }

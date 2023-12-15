@@ -1,32 +1,15 @@
-use tokio::{spawn, time::sleep};
-
-use crate::bot::{self, context::DisCtx, destination::Destination};
+use super::file_search_config::FileSearchConfig;
+use crate::bot::{
+    context::DisCtx,
+    send_msgs::{report_file_sync_conflict, report_rust_error},
+};
 use std::{collections::HashSet, path::PathBuf, time::Duration};
+use tokio::{spawn, time::sleep};
 
 pub const FUZ_VAULT_PATH: &str = "/home/fuzzy/obsidian/fuz-vault";
 pub const MAGIC_BEANS_VAULT_PATH: &str = "/home/fuzzy/obsidian/magic-beans-vault";
 
-pub struct SyncConflictConfig {
-    root_dir: &'static str,
-    notification_channel: Destination,
-}
-
-impl SyncConflictConfig {
-    pub fn gen_all_configs() -> Vec<SyncConflictConfig> {
-        vec![
-            SyncConflictConfig {
-                root_dir: FUZ_VAULT_PATH,
-                notification_channel: Destination::DebugObsidianCh,
-            },
-            SyncConflictConfig {
-                root_dir: MAGIC_BEANS_VAULT_PATH,
-                notification_channel: Destination::MagicBeansObsidianCh,
-            },
-        ]
-    }
-}
-
-pub async fn look_for_sync_conflicts(ctx: DisCtx, config: SyncConflictConfig) {
+pub async fn look_for_sync_conflicts(ctx: DisCtx, config: FileSearchConfig) {
     let mut file_sync_errors = HashSet::new();
 
     loop {
@@ -51,7 +34,7 @@ pub async fn look_for_sync_conflicts(ctx: DisCtx, config: SyncConflictConfig) {
                             msg = e
                         );
 
-                        spawn(bot::report_rust_error(ctx.clone(), err_msg));
+                        spawn(report_rust_error(ctx.clone(), err_msg));
                         continue;
                     }
                 };
@@ -64,7 +47,7 @@ pub async fn look_for_sync_conflicts(ctx: DisCtx, config: SyncConflictConfig) {
                         .unwrap()
                         .to_owned();
 
-                    spawn(bot::report_file_sync_conflict(
+                    spawn(report_file_sync_conflict(
                         ctx.clone(),
                         file_name,
                         path.to_str().unwrap().to_owned(),
