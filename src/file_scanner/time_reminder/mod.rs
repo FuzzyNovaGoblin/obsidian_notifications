@@ -1,16 +1,15 @@
 use self::model::{DateTimeParts, ReminderKey};
-use super::file_search_config::FileSearchConfig;
-use crate::{bot::{
-    context::DisCtx,
-    send_msgs::{report_reminder_notification, report_rust_error},
-}, file_scanner::path_str_no_root};
+use crate::{
+    bot::send_msgs::{report_reminder_notification, report_rust_error},
+    file_scanner::path_str_no_root,
+};
 use chrono::prelude::*;
 use regex::Regex;
 use std::{
     collections::{HashMap, HashSet},
     fs,
     path::PathBuf,
-    time::Duration,
+    time::Duration, sync::Arc,
 };
 use tokio::{spawn, task::JoinHandle, time::sleep};
 
@@ -20,28 +19,27 @@ const DATE_TIME_REGEX_STR: &str = r#"(?:- (?<checkbox>\[(?<checked>.)])?)\s?(?<m
 const _OBS_URI_TEMPLATE: &str =
     "obsidian://advanced-uri?vault={vault_name}&filepath={file_path}&line={line_num}";
 
-pub async fn look_for_time_reminders(ctx: DisCtx, config: FileSearchConfig) {
+pub async fn look_for_time_reminders(ctx: crate::Ctx, vault_name: Arc<String>) {
+    let vault = &ctx.config.vaults[&*vault_name];
     let mut reminders: HashMap<ReminderKey, Option<JoinHandle<()>>> = HashMap::new();
     let date_time_regex =
         Regex::new(DATE_TIME_REGEX_STR).expect("failed to compile RegEx dateTimeReg");
     let ignore_files =
         Regex::new(r#"(\/\.DS_Store$)|(\.[jJ][pP][gG]$)|(\.[jJ][pP][eE][gG]$)|(\.[pP][nN][gG]$)"#)
             .expect("failed to compile RegEx ignore_files");
-    let ignore_paths =
-        Regex::new(r#"(^.trash)"#)
-            .expect("failed to compile RegEx ignore_paths");
+    let ignore_paths = Regex::new(r#"(^.trash)"#).expect("failed to compile RegEx ignore_paths");
 
     loop {
         let mut discovered_pass: HashSet<ReminderKey> = HashSet::new();
 
-        let mut path_queue: Vec<PathBuf> = vec![config.root_dir.into()];
+        let mut path_queue: Vec<PathBuf> = vec![vault.root_dir.clone().into()];
 
         while let Some(path) = path_queue.pop() {
             let paths = std::fs::read_dir(path).unwrap();
             for item in paths.map(Result::unwrap) {
                 let path = item.path();
-                if path.is_dir(){
-                    if ignore_paths.is_match(&path_str_no_root(&path, config.root_dir)){
+                if path.is_dir() {
+                    if ignore_paths.is_match(&path_str_no_root(&path, vault.root_dir.clone())) {
                         continue;
                     }
                     path_queue.push(path.clone());
@@ -94,7 +92,7 @@ pub async fn look_for_time_reminders(ctx: DisCtx, config: FileSearchConfig) {
                                     key.clone(),
                                     Some(spawn(countdown_reminder(
                                         ctx.clone(),
-                                        config.clone(),
+                                        vault_name.to_owned(),
                                         key.clone(),
                                     ))),
                                 );
@@ -125,7 +123,7 @@ pub async fn look_for_time_reminders(ctx: DisCtx, config: FileSearchConfig) {
     }
 }
 
-async fn countdown_reminder(ctx: DisCtx, config: FileSearchConfig, key: ReminderKey) {
+async fn countdown_reminder(ctx: crate::Ctx, vault_name: Arc<String>, key: ReminderKey) {
     if key.completed_checked {
         return;
     }
@@ -158,9 +156,12 @@ async fn countdown_reminder(ctx: DisCtx, config: FileSearchConfig, key: Reminder
     spawn(report_reminder_notification(
         ctx.clone(),
         key.msg,
-        config.notification_channel,
+        ctx.config.vaults[vault_name.as_ref()].destination.clone(),
         format!("{}", key.time_parts),
-        path_str_no_root(&key.file_path, config.root_dir)
+        path_str_no_root(
+            &key.file_path,
+            &ctx.config.vaults[vault_name.as_ref()].root_dir,
+        ),
     ));
 
     sleep(Duration::from_secs(60)).await;

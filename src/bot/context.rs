@@ -4,6 +4,7 @@ use std::sync::Arc;
 pub type DisCtx = Arc<CacheAndHttp>;
 
 
+#[derive(Debug)]
 pub struct CacheAndHttp {
     pub http: Arc<serenity::http::Http>,
     pub cache: Arc<serenity::client::Cache>,

@@ -1,13 +1,13 @@
-use super::context::DisCtx;
-use super::destination::Destination;
+use crate::{config::destination::Destination, Ctx};
 use serenity::builder::{CreateAttachment, CreateEmbed};
+use std::{convert::Into, sync::Arc};
 
 pub async fn send_msg(
-    ctx: DisCtx,
+    ctx: crate::Ctx,
     msg: impl Into<String>,
     files: Option<Vec<CreateAttachment>>,
     embeds: Option<Vec<CreateEmbed>>,
-    dest: Destination,
+    dest: &Destination,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let id = dest.id(ctx.clone());
 
@@ -22,45 +22,46 @@ pub async fn send_msg(
         Some(files) => builder.files(files),
         None => builder,
     };
-
-    id.await.send_message(ctx, builder).await?;
+    id.await.send_message(ctx.dis_ctx.clone(), builder).await?;
 
     Ok(())
 }
 
 pub async fn report_reminder_notification(
-    ctx: DisCtx,
+    ctx: crate::Ctx,
     reminder_msg: String,
-    dest: Destination,
+    dest: String,
     time: String,
-    file: String
+    file: String,
 ) {
     println!("report_reminder_notification {reminder_msg}  time: {time}");
 
-    let embed = CreateEmbed::new().title(reminder_msg.clone()).description(format!("time: {time}\nfile: {file}"));
+    let embed = CreateEmbed::new()
+        .title(reminder_msg.clone())
+        .description(format!("time: {time}\nfile: {file}"));
 
-    send_msg(ctx, reminder_msg, None, Some(vec![embed]), dest)
+    send_msg(ctx.clone(), reminder_msg, None, Some(vec![embed]), ctx.get_dest(&dest))
         .await
         .unwrap();
 }
 
 pub async fn report_file_sync_conflict(
-    ctx: DisCtx,
+    ctx: crate::Ctx,
     file_name: String,
     file: String,
-    dest: Destination,
+    vault_name: Arc<String>
 ) {
     let err_msg = format!("file sync conflict: {file_name}");
     println!("report_file_sync_conflict: {err_msg}");
     let file = CreateAttachment::path(file).await.unwrap();
-    send_msg(ctx, err_msg, Some(vec![file]), None, dest)
+    send_msg(ctx.clone(), err_msg, Some(vec![file]), None, ctx.get_vault_dest(&*vault_name))
         .await
         .unwrap();
 }
 
-pub async fn report_rust_error(ctx: DisCtx, err_msg: String) {
+pub async fn report_rust_error(ctx: Ctx, err_msg: String) {
     eprintln!("err msg: {}", err_msg);
-    send_msg(ctx, err_msg, None, None, Destination::FuzzyObsidianCh)
+    send_msg(ctx.clone(), err_msg, None, None, ctx.get_error_ch())
         .await
         .unwrap();
 }

@@ -1,19 +1,19 @@
-use super::file_search_config::FileSearchConfig;
-use crate::bot::{
-    context::DisCtx,
-    send_msgs::{report_file_sync_conflict, report_rust_error},
+use crate::{
+    bot::send_msgs::{report_file_sync_conflict, report_rust_error},
+    Ctx,
 };
-use std::{collections::HashSet, path::PathBuf, time::Duration};
+use std::{collections::HashSet, path::PathBuf, time::Duration, sync::Arc};
 use tokio::{spawn, time::sleep};
 
 pub const FUZ_VAULT_PATH: &str = "/home/fuzzy/obsidian/fuz-vault";
 pub const MAGIC_BEANS_VAULT_PATH: &str = "/home/fuzzy/obsidian/magic-beans-vault";
 
-pub async fn look_for_sync_conflicts(ctx: DisCtx, config: FileSearchConfig) {
+pub async fn look_for_sync_conflicts(ctx: Ctx, vault_name: Arc<String>) {
+    let vault = &ctx.config.vaults[&*vault_name];
     let mut file_sync_errors = HashSet::new();
 
     loop {
-        let mut path_queue: Vec<PathBuf> = vec![config.root_dir.into()];
+        let mut path_queue: Vec<PathBuf> = vec![ctx.config.vaults[&*vault_name].root_dir.clone().into()];
 
         while let Some(path) = path_queue.pop() {
             let paths = std::fs::read_dir(path).unwrap();
@@ -41,7 +41,7 @@ pub async fn look_for_sync_conflicts(ctx: DisCtx, config: FileSearchConfig) {
 
                 if file_str.contains("sync-conflict") && file_sync_errors.insert(path.clone()) {
                     let file_name = path
-                        .strip_prefix(config.root_dir)
+                        .strip_prefix(vault.root_dir.clone())
                         .unwrap()
                         .to_str()
                         .unwrap()
@@ -51,7 +51,7 @@ pub async fn look_for_sync_conflicts(ctx: DisCtx, config: FileSearchConfig) {
                         ctx.clone(),
                         file_name,
                         path.to_str().unwrap().to_owned(),
-                        config.notification_channel,
+                        vault_name.clone(),
                     ));
                 }
             }

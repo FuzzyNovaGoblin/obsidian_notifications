@@ -1,6 +1,5 @@
 use std::path::Path;
 
-pub mod file_search_config;
 pub mod sync_conflict;
 pub mod time_reminder;
 
