@@ -25,7 +25,7 @@ pub async fn look_for_time_reminders(ctx: crate::Ctx, vault_name: Arc<String>) {
     let date_time_regex =
         Regex::new(DATE_TIME_REGEX_STR).expect("failed to compile RegEx dateTimeReg");
     let ignore_files =
-        Regex::new(r#"(\/\.DS_Store$)|(\.[jJ][pP][gG]$)|(\.[jJ][pP][eE][gG]$)|(\.[pP][nN][gG]$)"#)
+        Regex::new(r#"(\/\.DS_Store$)|(\.[jJ][pP][gG]$)|(\.[jJ][pP][eE][gG]$)|(\.[pP][nN][gG]$)|(\.[pP][Dd][fF])"#)
             .expect("failed to compile RegEx ignore_files");
     let ignore_paths = Regex::new(r#"(^.trash)"#).expect("failed to compile RegEx ignore_paths");
 
