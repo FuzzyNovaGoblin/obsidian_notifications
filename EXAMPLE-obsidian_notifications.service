@@ -1,4 +1,8 @@
 # actual file goes in /etc/systemd/system
+# update instances of `USER` to be the user you want to run this
+# also update `ExecStart` to be the path of the executable
+# the given path is where it will be if installed with cargo by USER
+
 
 [Unit]
 Description=obsidian notification service through discord
@@ -7,9 +11,9 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/home/fuzzy/.cargo/bin/obsidian_notifications
-User=fuzzy
-Group=fuzzy
+ExecStart=/home/USER/.cargo/bin/obsidian_notifications
+User=USER
+Group=USER
 Type=idle
 Restart=on-abnormal
 RestartSec=15
