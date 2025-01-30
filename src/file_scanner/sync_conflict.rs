@@ -5,8 +5,6 @@ use crate::{
 use std::{collections::HashSet, path::PathBuf, time::Duration, sync::Arc};
 use tokio::{spawn, time::sleep};
 
-pub const FUZ_VAULT_PATH: &str = "/home/fuzzy/obsidian/fuz-vault";
-pub const MAGIC_BEANS_VAULT_PATH: &str = "/home/fuzzy/obsidian/magic-beans-vault";
 
 pub async fn look_for_sync_conflicts(ctx: Ctx, vault_name: Arc<String>) {
     let vault = &ctx.config.vaults[&*vault_name];

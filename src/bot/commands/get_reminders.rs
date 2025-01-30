@@ -66,12 +66,6 @@ pub async fn run(channel_id: ChannelId) -> String {
         msg
     }
 
-    // fs::write(
-    //     "/home/fuzzy/Downloads/tmp",
-    //     format!("{:#?}", sys_state.lock().await.reminders.get(dest)),
-    // ).unwrap();
-
-    // format!("{:?}", sys_state.lock().await.reminders.get(dest))
 }
 
 pub fn register() -> CreateCommand {
