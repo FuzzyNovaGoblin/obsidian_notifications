@@ -1,6 +1,7 @@
 use self::destination::Destination;
 use crate::bot::context::DisCtx;
 use std::{collections::HashMap, sync::Arc};
+use shared_singleton::*;
 
 pub mod destination;
 pub mod vault;
@@ -12,6 +13,8 @@ pub struct Config {
     pub destinations: HashMap<String, destination::Destination>,
     pub vaults: HashMap<String, vault::Vault>,
 }
+
+impl_singleton_arc!(Config, Config::load());
 
 impl Config {
     pub fn load() -> Config {

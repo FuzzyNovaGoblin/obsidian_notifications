@@ -8,6 +8,7 @@ use tokio::{spawn, task::JoinHandle, time::sleep};
 pub mod bot;
 pub mod config;
 pub mod file_scanner;
+pub mod state;
 
 type Ctx = Arc<config::Context>;
 

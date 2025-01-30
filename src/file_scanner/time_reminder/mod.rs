@@ -2,18 +2,22 @@ use self::model::{DateTimeParts, ReminderKey};
 use crate::{
     bot::send_msgs::{report_reminder_notification, report_rust_error},
     file_scanner::path_str_no_root,
+    state::State,
 };
 use chrono::prelude::*;
 use regex::Regex;
+use shared_singleton::Singleton;
 use std::{
+    borrow::BorrowMut,
     collections::{HashMap, HashSet},
     fs,
     path::PathBuf,
-    time::Duration, sync::Arc,
+    sync::Arc,
+    time::Duration,
 };
 use tokio::{spawn, task::JoinHandle, time::sleep};
 
-mod model;
+pub mod model;
 
 const DATE_TIME_REGEX_STR: &str = r#"(?:- (?<checkbox>\[(?<checked>.)])?)\s?(?<message>.*)\(@(?<date>(?<year>\d{2}|\d{4}).(?<month>\d{1,2}).(?<day>\d{1,2}))?(?:[-\s](?<time>(?<hour>\d{1,2}):?(?<minute>\d{2})(?:(?<second>\d{2}))?))?\)"#;
 const _OBS_URI_TEMPLATE: &str =
@@ -27,7 +31,8 @@ pub async fn look_for_time_reminders(ctx: crate::Ctx, vault_name: Arc<String>) {
     let ignore_files =
         Regex::new(r#"(\/\.DS_Store$)|(\.[jJ][pP][gG]$)|(\.[jJ][pP][eE][gG]$)|(\.[pP][nN][gG]$)|(\.[pP][Dd][fF])"#)
             .expect("failed to compile RegEx ignore_files");
-    let ignore_paths = Regex::new(r#"(^.trash)"#).expect("failed to compile RegEx ignore_paths");
+    let ignore_paths = Regex::new(r#"(^\.trash)|(^\.stfolder)|(^\.obsidian)|(^.stversions)"#).expect("failed to compile RegEx ignore_paths");
+    let sys_state = State::singleton();
 
     loop {
         let mut discovered_pass: HashSet<ReminderKey> = HashSet::new();
@@ -118,6 +123,11 @@ pub async fn look_for_time_reminders(ctx: crate::Ctx, vault_name: Arc<String>) {
                 }
             }
         }
+
+        sys_state.lock().await.borrow_mut().reminders.insert(
+            vault_name.as_ref().to_owned(),
+            reminders.keys().cloned().collect(),
+        );
 
         sleep(Duration::from_secs(5)).await;
     }

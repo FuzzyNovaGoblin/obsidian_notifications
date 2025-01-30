@@ -2,3 +2,4 @@
 bot_token
 secret_ids.rs
 .vscode
+obsidian_notifications.service

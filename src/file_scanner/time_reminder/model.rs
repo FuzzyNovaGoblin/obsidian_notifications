@@ -12,9 +12,9 @@ pub struct ReminderKey {
 
 #[derive(Eq, Hash, PartialEq, Clone, Debug)]
 pub struct DateTimeParts {
-    year: Option<u32>,
-    month: Option<u32>,
-    day: Option<u32>,
+    pub year: Option<u32>,
+    pub month: Option<u32>,
+    pub day: Option<u32>,
 
     hour: Option<u32>,
     minute: Option<u32>,
@@ -69,6 +69,28 @@ impl DateTimeParts {
                 .unwrap_or(if top_of_hour { now.minute() } else { 0 }),
             self.second.unwrap_or(0),
         )
+    }
+
+    pub fn discord_display(&self) -> String {
+        let get_str = |v: Option<u32>, count: usize| match v {
+            Some(v) => v.to_string(),
+            None => "\\*".repeat(count),
+        };
+
+        let ret_str = format!(
+            "{}-{}-{} {:0>2}:{:0>2}",
+            get_str(self.year, 4),
+            get_str(self.month, 2),
+            get_str(self.day, 2),
+            get_str(self.hour, 2),
+            get_str(self.minute, 2),
+        );
+
+        if let Some(s) = self.second {
+            format!("{} {:0>2}", ret_str, s)
+        } else {
+            ret_str
+        }
     }
 }
 

@@ -1,4 +1,4 @@
-# actual file in /etc/systemd/system
+# actual file goes in /etc/systemd/system
 
 [Unit]
 Description=obsidian notification service through discord
