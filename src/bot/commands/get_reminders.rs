@@ -40,18 +40,19 @@ pub async fn run(channel_id: ChannelId) -> String {
         None => return "reminders contained None, check back later".into(),
     };
 
-    for rem in reminders {
+    for reminder in reminders {
         let reminder_string = format!(
             "- time: {time}\n  location: {loc}\n  msg: `{msg}`",
-            time = rem.time_parts.discord_display(),
-            loc = rem
+            time = reminder.time_parts.discord_display(),
+            loc = reminder
                 .file_path
                 .strip_prefix(&cfg.vaults.get(vault_name).unwrap().root_dir)
-                .unwrap_or(&rem.file_path).trim_matches('/'),
-            msg = rem.msg
+                .unwrap_or(&reminder.file_path).trim_matches('/'),
+            msg = reminder.msg
         );
 
-        // ret_strings.push(
+        ret_strings.push(reminder_string);
+
         dbg!(&ret_strings);
     }
 

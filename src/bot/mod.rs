@@ -25,8 +25,6 @@ pub async fn bot_start(config: crate::config::Config) -> (crate::config::Context
         .expect("Error creating client");
     let dis_ctx = CacheAndHttp::new(client.http.clone(), client.cache.clone());
 
-    // let get_reminders_cmd = CreateCommand::new("get_reminders").fun
-
     (
         Context {
             dis_ctx: Arc::new(dis_ctx),
