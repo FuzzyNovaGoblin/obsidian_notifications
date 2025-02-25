@@ -2,7 +2,6 @@ use std::{fs, path::PathBuf, sync::Arc, thread::sleep};
 
 use chrono::{Datelike, Local, TimeDelta, TimeZone};
 use regex::Regex;
-use tokio::spawn;
 
 use crate::{bot::send_msgs::send_daily_todo_reminder, config::vault::Vault};
 const HEADER_REGEX_PT1: &str = r#"(?<todo_header>^# "#;
