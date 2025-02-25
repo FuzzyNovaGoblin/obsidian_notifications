@@ -59,15 +59,11 @@ async fn start_tasks(config: Config) -> (Vec<JoinHandle<()>>, Ctx) {
             ctx.clone(),
             vault_name.clone().clone(),
         )));
-        if &*vault_name == "fuz_vault"{
 
-            tasks.push(spawn(daily_todo::daily_todo_thread(
-                ctx.clone(),
-                vault_name.clone().clone(),
-            )));
-        }else{
-            println!("undo this before release!", )
-        }
+        tasks.push(spawn(daily_todo::daily_todo_thread(
+            ctx.clone(),
+            vault_name.clone().clone(),
+        )));
     }
 
     (tasks, ctx)
