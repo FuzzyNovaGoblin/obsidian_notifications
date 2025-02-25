@@ -44,15 +44,6 @@ pub async fn bot_start(config: crate::config::Config) -> (crate::config::Context
                 println!("Executing command {}...", ctx.command().qualified_name);
             })
         },
-        event_handler: |_ctx, event, _framework, _data| {
-            Box::pin(async move {
-                println!(
-                    "Got an event in event handler: {:?}",
-                    event.snake_case_name()
-                );
-                Ok(())
-            })
-        },
         ..Default::default()
     };
 

@@ -41,6 +41,10 @@ pub struct Context {
 }
 
 impl Context {
+    // pub fn get_vault_name_from_dest(&self, dest: &Destination) -> &str{
+    //     self.config.vaults.iter().filter_map(|(name, vlt)|if vlt. == dest.)
+    // }
+
     pub fn get_error_ch(&self) -> &Destination {
         &self.config.destinations[&self.config.rust_error_ch]
     }

@@ -13,6 +13,8 @@ dest2 = {id = 999999999999999999, ch_type="server"}
 destination = "dest1"           # name of destination for this vaults notifications
 debug_destination = "dest1"     # this is only used for debugging, just leave it the same as `destination` if you dont need it
 root_dir = "/path/to/vault1"     # path of your obsidian vault
+todo_path = "General/TODO.md"
+todo_section_header = "TODO"
 
 # you can have multiple vaults
 [vaults.VAULTNAME2]

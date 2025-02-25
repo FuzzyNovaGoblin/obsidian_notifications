@@ -1,7 +1,7 @@
 use crate::bot::send_msgs::report_rust_error;
 use bot::bot_start;
 use config::Config;
-use file_scanner::{sync_conflict, time_reminder};
+use file_scanner::{daily_todo, sync_conflict, time_reminder};
 use std::{sync::Arc, time::Duration};
 use tokio::{spawn, task::JoinHandle, time::sleep};
 
@@ -59,6 +59,15 @@ async fn start_tasks(config: Config) -> (Vec<JoinHandle<()>>, Ctx) {
             ctx.clone(),
             vault_name.clone().clone(),
         )));
+        if &*vault_name == "fuz_vault"{
+
+            tasks.push(spawn(daily_todo::daily_todo_thread(
+                ctx.clone(),
+                vault_name.clone().clone(),
+            )));
+        }else{
+            println!("undo this before release!", )
+        }
     }
 
     (tasks, ctx)

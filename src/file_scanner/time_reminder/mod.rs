@@ -31,7 +31,8 @@ pub async fn look_for_time_reminders(ctx: crate::Ctx, vault_name: Arc<String>) {
     let ignore_files =
         Regex::new(r#"(\/\.DS_Store$)|(\.[jJ][pP][gG]$)|(\.[jJ][pP][eE][gG]$)|(\.[pP][nN][gG]$)|(\.[pP][Dd][fF])"#)
             .expect("failed to compile RegEx ignore_files");
-    let ignore_paths = Regex::new(r#"(^\.trash)|(^\.stfolder)|(^\.obsidian)|(^.stversions)"#).expect("failed to compile RegEx ignore_paths");
+    let ignore_paths = Regex::new(r#"(^\.trash)|(^\.stfolder)|(^\.obsidian)|(^.stversions)"#)
+        .expect("failed to compile RegEx ignore_paths");
     let sys_state = State::singleton();
 
     loop {
@@ -124,6 +125,14 @@ pub async fn look_for_time_reminders(ctx: crate::Ctx, vault_name: Arc<String>) {
             }
         }
 
+        for key in get_empty(&reminders) {
+            if let Some((_, Some(j_handle))) = reminders.remove_entry(&key) {
+                if !j_handle.is_finished() {
+                    j_handle.abort();
+                }
+            }
+        }
+
         sys_state.lock().await.borrow_mut().reminders.insert(
             vault_name.as_ref().to_owned(),
             reminders.keys().cloned().collect(),
@@ -185,5 +194,13 @@ fn get_non_existing(
         .keys()
         .filter(|k| !discovered.contains(k))
         .cloned()
+        .collect()
+}
+
+fn get_empty(reminders: &HashMap<ReminderKey, Option<JoinHandle<()>>>) -> Vec<ReminderKey> {
+    reminders
+        .iter()
+        .filter(|(_k, v)| v.is_none())
+        .map(|(k, _v)| k.clone())
         .collect()
 }
