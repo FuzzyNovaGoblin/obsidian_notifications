@@ -1,7 +1,8 @@
-use std::{fs, path::PathBuf, sync::Arc, thread::sleep};
+use std::{fs, path::PathBuf, sync::Arc};
 
 use chrono::{Datelike, Local, TimeDelta, TimeZone};
 use regex::Regex;
+use tokio::{spawn, time::sleep};
 
 use crate::{bot::send_msgs::send_daily_todo_reminder, config::vault::Vault};
 const HEADER_REGEX_PT1: &str = r#"(?<todo_header>^# "#;
@@ -23,12 +24,11 @@ pub async fn daily_todo_thread(ctx: crate::Ctx, vault_name: Arc<String>) {
             }
         }
 
-        send_daily_todo_reminder(
+        spawn(send_daily_todo_reminder(
             ctx.clone(),
             msg,
             ctx.config.vaults[vault_name.as_ref()].destination.clone(),
-        )
-        .await;
+        ));
 
         let now = Local::now();
         let target_time = chrono::Local
@@ -42,7 +42,7 @@ pub async fn daily_todo_thread(ctx: crate::Ctx, vault_name: Arc<String>) {
         } else {
             target_time.to_std().unwrap()
         };
-        sleep(sleep_time);
+        sleep(sleep_time).await;
     }
 }
 
