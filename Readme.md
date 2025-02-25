@@ -28,7 +28,7 @@ TOD = time of day
 ## Planed Features
 
 - [ ] fix daily reminders only sending 1 message
-- [ ] current solution for commands is deprecated and should be updated
+- [x] current solution for commands is deprecated and should be updated
 - [ ] make it so if assumed value for a time has already passed then it will increment the value to get the next time it could happen (I might already be doing this but I should double check that I did)
 - [ ] have cronjob style reminders more more advanced repeating settings
 - [ ] make reminders for headers

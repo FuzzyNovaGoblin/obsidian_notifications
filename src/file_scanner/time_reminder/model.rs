@@ -74,7 +74,7 @@ impl DateTimeParts {
     pub fn discord_display(&self) -> String {
         let get_str = |v: Option<u32>, count: usize| match v {
             Some(v) => v.to_string(),
-            None => "\\*".repeat(count),
+            None => r"\*".repeat(count),
         };
 
         let ret_str = format!(
