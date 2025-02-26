@@ -32,17 +32,19 @@ pub async fn daily_todo_thread(ctx: crate::Ctx, vault_name: Arc<String>) {
 
         let now = Local::now();
         let target_time = chrono::Local
-            .with_ymd_and_hms(now.year(), now.month(), now.day(), 9, 0, 0)
+            .with_ymd_and_hms(now.year(), now.month(), now.day(), 10, 59, 0)
             .single()
             .unwrap()
             - now;
 
-        let sleep_time = if target_time.num_seconds() < 0 {
-            (target_time + TimeDelta::days(1)).to_std().unwrap()
+        let sleep_time = if target_time.num_seconds().abs() <= 60 {
+            TimeDelta::days(1).to_std().unwrap()
+        } else if target_time.num_seconds() < 0 {
+            dbg!((target_time + TimeDelta::days(1)).to_std().unwrap())
         } else {
             target_time.to_std().unwrap()
         };
-        sleep(sleep_time).await;
+        sleep(dbg!(sleep_time)).await;
     }
 }
 
