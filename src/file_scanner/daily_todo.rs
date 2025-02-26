@@ -32,7 +32,7 @@ pub async fn daily_todo_thread(ctx: crate::Ctx, vault_name: Arc<String>) {
 
         let now = Local::now();
         let target_time = chrono::Local
-            .with_ymd_and_hms(now.year(), now.month(), now.day(), 10, 59, 0)
+            .with_ymd_and_hms(now.year(), now.month(), now.day(), 8, 30, 0)
             .single()
             .unwrap()
             - now;
