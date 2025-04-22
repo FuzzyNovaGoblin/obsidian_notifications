@@ -4,7 +4,7 @@ use poise::{serenity_prelude::CreateAttachment, CreateReply};
 use shared_singleton::Singleton;
 
 #[poise::command(slash_command)]
-pub async fn get_reminders<'a>(ctx: PoiseContext<'a>) -> Result<(), Error> {
+pub async fn get_reminders(ctx: PoiseContext<'_>) -> Result<(), Error> {
     let cfg = Config::singleton();
     let sys_state = State::singleton();
 

@@ -12,7 +12,7 @@ const TASK_REGEX: &str = r#"^(?:[-\+] (?<checkbox>\[(?<checked>.)])?)\s?(?<messa
 
 pub async fn daily_todo_thread(ctx: crate::Ctx, vault_name: Arc<String>) {
     let vault = &ctx.config.vaults[&*vault_name];
-    let (task_regex, header_regex) = build_regex(&vault);
+    let (task_regex, header_regex) = build_regex(vault);
 
     loop {
         let tasks = get_reminders(vault, &task_regex, &header_regex);
@@ -40,11 +40,11 @@ pub async fn daily_todo_thread(ctx: crate::Ctx, vault_name: Arc<String>) {
         let sleep_time = if target_time.num_seconds().abs() <= 60 {
             TimeDelta::days(1).to_std().unwrap()
         } else if target_time.num_seconds() < 0 {
-            dbg!((target_time + TimeDelta::days(1)).to_std().unwrap())
+            (target_time + TimeDelta::days(1)).to_std().unwrap()
         } else {
             target_time.to_std().unwrap()
         };
-        sleep(dbg!(sleep_time)).await;
+        sleep(sleep_time).await;
     }
 }
 
@@ -59,23 +59,18 @@ fn get_reminders(vault: &Vault, task_regex: &Regex, header_regex: &Regex) -> Vec
 
     for line in file_data.lines() {
         if header_regex.is_match(line) {
-            if header_regex
+            under_todo_header = header_regex
                 .captures(line)
                 .unwrap()
                 .name("todo_header")
-                .is_some()
-            {
-                under_todo_header = true;
-            } else {
-                under_todo_header = false;
-            }
+                .is_some();
         } else if under_todo_header {
             if let Some(caps) = task_regex.captures(line) {
                 let checked_cap = caps.name("checked");
                 tasks.push(Task {
                     checked: checked_cap.is_none()
                         || (checked_cap.is_some()
-                            && checked_cap.unwrap().as_str().trim().len() > 0),
+                            && !checked_cap.unwrap().as_str().trim().is_empty()),
                     msg: match caps.name("message") {
                         Some(v) => v.as_str().into(),
                         None => String::new(),

@@ -31,7 +31,7 @@ pub async fn send_msg(
 pub async fn send_daily_todo_reminder(ctx: crate::Ctx, msg: String, dest: String) {
     println!("send_daily_todo_reminder for {:?}", dest);
 
-    if msg.len() == 0 {
+    if msg.is_empty() {
         println!(
             "not sending send_daily_todo_reminder for {:?}, there are no items to send",
             dest
