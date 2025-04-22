@@ -8,7 +8,7 @@ use crate::{bot::send_msgs::send_daily_todo_reminder, config::vault::Vault};
 const HEADER_REGEX_PT1: &str = r#"(?<todo_header>^# "#;
 const HEADER_REGEX_PT2: &str = r#"$)|(^# [A-Za-z0-9\s]*$)"#;
 // const HEADER_REGEX: &str = r#"(?<todo_header>^# TODO$)|(^# [A-Za-z0-9\s]*$)"#;
-const TASK_REGEX: &str = r#"^(?:- (?<checkbox>\[(?<checked>.)])?)\s?(?<message>.*)"#;
+const TASK_REGEX: &str = r#"^(?:[-\+] (?<checkbox>\[(?<checked>.)])?)\s?(?<message>.*)"#;
 
 pub async fn daily_todo_thread(ctx: crate::Ctx, vault_name: Arc<String>) {
     let vault = &ctx.config.vaults[&*vault_name];

@@ -19,7 +19,7 @@ use tokio::{spawn, task::JoinHandle, time::sleep};
 
 pub mod model;
 
-const DATE_TIME_REGEX_STR: &str = r#"(?:- (?<checkbox>\[(?<checked>.)])?)\s?(?<message>.*)\(@(?<date>(?<year>\d{2}|\d{4}).(?<month>\d{1,2}).(?<day>\d{1,2}))?(?:[-\s](?<time>(?<hour>\d{1,2}):?(?<minute>\d{2})(?:(?<second>\d{2}))?))?\)"#;
+const DATE_TIME_REGEX_STR: &str = r#"(?:[-\+] (?<checkbox>\[(?<checked>.)])?)\s?(?<message>.*)\(@(?<date>(?<year>\d{2}|\d{4}).(?<month>\d{1,2}).(?<day>\d{1,2}))?(?:[-\s](?<time>(?<hour>\d{1,2}):?(?<minute>\d{2})(?:(?<second>\d{2}))?))?\)"#;
 const _OBS_URI_TEMPLATE: &str =
     "obsidian://advanced-uri?vault={vault_name}&filepath={file_path}&line={line_num}";
 
@@ -29,8 +29,9 @@ pub async fn look_for_time_reminders(ctx: crate::Ctx, vault_name: Arc<String>) {
     let date_time_regex =
         Regex::new(DATE_TIME_REGEX_STR).expect("failed to compile RegEx dateTimeReg");
     let ignore_files =
-        Regex::new(r#"(\/\.DS_Store$)|(\.[jJ][pP][gG]$)|(\.[jJ][pP][eE][gG]$)|(\.[pP][nN][gG]$)|(\.[pP][Dd][fF])"#)
+        Regex::new(r#"(\.tar)|(\.)|(\/\.DS_Store$)|(\.[jJ][pP][gG]$)|(\.[jJ][pP][eE][gG]$)|(\.[pP][nN][gG]$)|(\.[pP][Dd][fF])"#)
             .expect("failed to compile RegEx ignore_files");
+    let allowed_files = Regex::new(r#"(\.md)"#).expect("failed to compile RegEx");
     let ignore_paths = Regex::new(r#"(^\.trash)|(^\.stfolder)|(^\.obsidian)|(^.stversions)"#)
         .expect("failed to compile RegEx ignore_paths");
     let sys_state = State::singleton();
@@ -49,9 +50,14 @@ pub async fn look_for_time_reminders(ctx: crate::Ctx, vault_name: Arc<String>) {
                         continue;
                     }
                     path_queue.push(path.clone());
-                } else if ignore_files.is_match(path.to_str().unwrap()) {
+                }
+                // else if ignore_files.is_match(path.to_str().unwrap()) {
+                //     continue;
+                // }
+                else if !allowed_files.is_match(path.to_str().unwrap()) {
                     continue;
-                } else {
+                }
+                else {
                     let file_data = match fs::read_to_string(&path) {
                         Ok(v) => v,
                         Err(e) => {
