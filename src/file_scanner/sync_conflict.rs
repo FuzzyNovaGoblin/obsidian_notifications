@@ -9,6 +9,7 @@ use tokio::{spawn, time::sleep};
 pub async fn look_for_sync_conflicts(ctx: Ctx, vault_name: Arc<String>) {
     let vault = &ctx.config.vaults[&*vault_name];
     let mut file_sync_errors = HashSet::new();
+    let trash_dir = PathBuf::from_iter([&ctx.config.vaults[&*vault_name].root_dir, ".trash"]);
 
     loop {
         let mut path_queue: Vec<PathBuf> = vec![ctx.config.vaults[&*vault_name].root_dir.clone().into()];
@@ -18,7 +19,7 @@ pub async fn look_for_sync_conflicts(ctx: Ctx, vault_name: Arc<String>) {
             for item in paths.map(Result::unwrap) {
                 let path = item.path();
 
-                if path.is_dir() {
+                if path.is_dir() && path != trash_dir {
                     path_queue.push(path.clone());
                 }
 
