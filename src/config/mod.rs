@@ -1,7 +1,7 @@
 use self::destination::Destination;
 use crate::bot::context::DisCtx;
-use std::{collections::HashMap, sync::Arc};
 use shared_singleton::*;
+use std::{collections::HashMap, sync::Arc};
 
 pub mod destination;
 pub mod vault;
@@ -49,19 +49,19 @@ impl Context {
         &self.config.destinations[&self.config.rust_error_ch]
     }
 
-    pub fn get_dest(&self, dest_name: impl AsRef<str>)->&Destination{
+    pub fn get_dest(&self, dest_name: impl AsRef<str>) -> &Destination {
         &self.config.destinations[dest_name.as_ref()]
     }
 
-    pub fn get_vault_dest(&self, vault_name: impl AsRef<str>)->&Destination{
+    pub fn get_vault_dest(&self, vault_name: impl AsRef<str>) -> &Destination {
         &self.config.destinations[&*self.config.vaults[vault_name.as_ref()].destination]
     }
 
-    pub fn get_vault_dbg_dest(&self, vault_name: impl AsRef<str>)->&Destination{
+    pub fn get_vault_dbg_dest(&self, vault_name: impl AsRef<str>) -> &Destination {
         &self.config.destinations[&*self.config.vaults[vault_name.as_ref()].debug_destination]
     }
 
-    pub fn get_all_vault_names(&self) -> impl Iterator< Item = Arc<String>> + '_ {
+    pub fn get_all_vault_names(&self) -> impl Iterator<Item = Arc<String>> + '_ {
         self.config.vaults.keys().map(|k| Arc::new(k.clone()))
     }
 }

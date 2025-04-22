@@ -36,8 +36,7 @@ pub async fn send_daily_todo_reminder(ctx: crate::Ctx, msg: String, dest: String
             "not sending send_daily_todo_reminder for {:?}, there are no items to send",
             dest
         );
-    }
-    else if msg.len() < 2000 {
+    } else if msg.len() < 2000 {
         send_msg(ctx.clone(), msg, None, None, ctx.get_dest(&dest))
             .await
             .unwrap();

@@ -7,5 +7,4 @@ pub struct State {
     pub reminders: HashMap<String, Vec<ReminderKey>>,
 }
 
-
 impl_singleton_arc_mutex_tokio!(State, State::default());

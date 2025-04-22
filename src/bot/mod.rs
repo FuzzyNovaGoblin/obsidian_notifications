@@ -1,7 +1,7 @@
 use self::context::CacheAndHttp;
 use crate::config::Context;
 use poise::serenity_prelude::all::{Client, GatewayIntents};
-use std::{sync::Arc,time::Duration};
+use std::{sync::Arc, time::Duration};
 
 pub mod commands;
 pub mod context;

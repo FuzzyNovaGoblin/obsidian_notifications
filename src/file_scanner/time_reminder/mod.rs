@@ -28,7 +28,7 @@ pub async fn look_for_time_reminders(ctx: crate::Ctx, vault_name: Arc<String>) {
     let mut reminders: HashMap<ReminderKey, Option<JoinHandle<()>>> = HashMap::new();
     let date_time_regex =
         Regex::new(DATE_TIME_REGEX_STR).expect("failed to compile RegEx dateTimeReg");
-       let allowed_files = Regex::new(r#"(\.md)"#).expect("failed to compile RegEx");
+    let allowed_files = Regex::new(r#"(\.md)"#).expect("failed to compile RegEx");
     let ignore_paths = Regex::new(r#"(^\.trash)|(^\.stfolder)|(^\.obsidian)|(^.stversions)"#)
         .expect("failed to compile RegEx ignore_paths");
     let sys_state = State::singleton();
@@ -47,11 +47,9 @@ pub async fn look_for_time_reminders(ctx: crate::Ctx, vault_name: Arc<String>) {
                         continue;
                     }
                     path_queue.push(path.clone());
-                }
-                else if !allowed_files.is_match(path.to_str().unwrap()) {
+                } else if !allowed_files.is_match(path.to_str().unwrap()) {
                     continue;
-                }
-                else {
+                } else {
                     let file_data = match fs::read_to_string(&path) {
                         Ok(v) => v,
                         Err(e) => {

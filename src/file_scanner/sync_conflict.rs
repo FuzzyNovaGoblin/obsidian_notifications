@@ -2,9 +2,8 @@ use crate::{
     bot::send_msgs::{report_file_sync_conflict, report_rust_error},
     Ctx,
 };
-use std::{collections::HashSet, path::PathBuf, time::Duration, sync::Arc};
+use std::{collections::HashSet, path::PathBuf, sync::Arc, time::Duration};
 use tokio::{spawn, time::sleep};
-
 
 pub async fn look_for_sync_conflicts(ctx: Ctx, vault_name: Arc<String>) {
     let vault = &ctx.config.vaults[&*vault_name];
@@ -12,7 +11,8 @@ pub async fn look_for_sync_conflicts(ctx: Ctx, vault_name: Arc<String>) {
     let trash_dir = PathBuf::from_iter([&ctx.config.vaults[&*vault_name].root_dir, ".trash"]);
 
     loop {
-        let mut path_queue: Vec<PathBuf> = vec![ctx.config.vaults[&*vault_name].root_dir.clone().into()];
+        let mut path_queue: Vec<PathBuf> =
+            vec![ctx.config.vaults[&*vault_name].root_dir.clone().into()];
 
         while let Some(path) = path_queue.pop() {
             let paths = std::fs::read_dir(path).unwrap();
