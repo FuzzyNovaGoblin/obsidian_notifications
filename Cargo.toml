@@ -6,11 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = "0.4.31"
-poise = "0.6.1"
-regex = "1.10.2"
-serde = "1.0.218"
+chrono = "^0.4.44"
+poise = "^0.6.2"
+regex = "^1.12.3"
+serde = "^1.0.228"
 # serenity = "0.12.0"
-shared_singleton = { version = "0.2.1", features = ["tokio"] }
-tokio = {version = "1.43.0", features = ["full"]}
-toml = "0.8.20"
+shared_singleton = { version = "^0.2.1", features = ["tokio"] }
+tokio = {version = "^1.43.0", features = ["full"]}
+toml = "^1.1.2+spec-1.1.0"
