@@ -14,7 +14,29 @@ pub async fn daily_todo_thread(ctx: crate::Ctx, vault_name: Arc<String>) {
     let vault = &ctx.config.vaults[&*vault_name];
     let (task_regex, header_regex) = build_regex(vault);
 
+    let mut startup_sent = !vault.daily_on_start;
+
     loop {
+        dbg!(&vault, startup_sent);
+        if startup_sent {
+            let now = Local::now();
+            let target_time = chrono::Local
+                .with_ymd_and_hms(now.year(), now.month(), now.day(), 8, 30, 0)
+                .single()
+                .unwrap()
+                - now;
+
+            let sleep_time = if target_time.num_seconds().abs() <= 60 {
+                TimeDelta::days(1).to_std().unwrap()
+            } else if target_time.num_seconds() < 0 {
+                (target_time + TimeDelta::days(1)).to_std().unwrap()
+            } else {
+                target_time.to_std().unwrap()
+            };
+            sleep(sleep_time).await;
+        }
+        startup_sent = true;
+
         let tasks = get_reminders(vault, &task_regex, &header_regex);
         let mut msg = String::new();
 
@@ -29,22 +51,6 @@ pub async fn daily_todo_thread(ctx: crate::Ctx, vault_name: Arc<String>) {
             msg,
             ctx.config.vaults[vault_name.as_ref()].destination.clone(),
         ));
-
-        let now = Local::now();
-        let target_time = chrono::Local
-            .with_ymd_and_hms(now.year(), now.month(), now.day(), 8, 30, 0)
-            .single()
-            .unwrap()
-            - now;
-
-        let sleep_time = if target_time.num_seconds().abs() <= 60 {
-            TimeDelta::days(1).to_std().unwrap()
-        } else if target_time.num_seconds() < 0 {
-            (target_time + TimeDelta::days(1)).to_std().unwrap()
-        } else {
-            target_time.to_std().unwrap()
-        };
-        sleep(sleep_time).await;
     }
 }
 

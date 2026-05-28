@@ -15,6 +15,7 @@ debug_destination = "dest1"     # this is only used for debugging, just leave it
 root_dir = "/path/to/vault1"     # path of your obsidian vault
 todo_path = "General/TODO.md"
 todo_section_header = "TODO"
+daily_on_start = false
 
 # you can have multiple vaults
 [vaults.VAULTNAME2]
